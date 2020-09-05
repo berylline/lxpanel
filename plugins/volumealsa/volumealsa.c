@@ -1493,12 +1493,8 @@ static GtkWidget *volumealsa_configure(LXPanel *panel, GtkWidget *p)
     }
     if (active < 0)
         active = 0;
-#if GTK_CHECK_VERSION(2, 24, 0)
     mixer_selector = gtk_combo_box_new_with_model_and_entry(GTK_TREE_MODEL(list));
     gtk_combo_box_set_entry_text_column(GTK_COMBO_BOX(mixer_selector), 0);
-#else
-    mixer_selector = gtk_combo_box_entry_new_with_model(GTK_TREE_MODEL(list), 0);
-#endif
     g_object_unref(list);
     /* gtk_combo_box_set_wrap_width(GTK_COMBO_BOX(mixer_selector), 1); */
     gtk_combo_box_set_active(GTK_COMBO_BOX(mixer_selector), active);

@@ -98,11 +98,7 @@ static GtkWidget *pager_constructor(LXPanel *panel, config_setting_t *settings)
     int border = 1; /* NOTE: old 'pager' used 2, WnckPager has 1, need 1 more */
 
     /* FIXME: use some global setting for border */
-#if GTK_CHECK_VERSION(3, 0, 0)
     w = wnck_pager_new();
-#else
-    w = wnck_pager_new(NULL);
-#endif
     g_return_val_if_fail(w != NULL, NULL);
     d = g_new(PagerData, 1);
     d->pager = WNCK_PAGER(w);

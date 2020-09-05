@@ -36,9 +36,6 @@
 
 #include "ev.h"
 
-#if !GLIB_CHECK_VERSION(2, 40, 0)
-# define g_info(...) g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
-#endif
 
 /* -----------------------------------------------------------------------------
  *   Definitions used by lxpanel main code internally */

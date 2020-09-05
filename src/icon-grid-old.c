@@ -25,9 +25,7 @@
 #include "icon-grid-old.h"
 #include "private.h"
 
-#if GTK_CHECK_VERSION(3, 0, 0)
 #include <gtk/gtkx.h>
-#endif
 
 static gboolean icon_grid_placement(IconGrid * ig);
 static void icon_grid_geometry(IconGrid * ig, gboolean layout);

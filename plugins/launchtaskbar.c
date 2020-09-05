@@ -361,9 +361,6 @@ static gboolean on_launchbar_drag_source(GtkWidget *widget, GdkEvent *event,
     FmFileInfo *fi;
     GdkWindow *win;
     gdouble x, y;
-#if !GTK_CHECK_VERSION(2, 22, 0)
-    gint px, py;
-#endif
 
     switch (event->type)
     {
@@ -382,15 +379,8 @@ static gboolean on_launchbar_drag_source(GtkWidget *widget, GdkEvent *event,
         y = event->button.y;
         while (win != NULL && win != gtk_widget_get_window(widget))
         {
-#if GTK_CHECK_VERSION(2, 22, 0)
             gdk_window_coords_to_parent(win, x, y, &x, &y);
             win = gdk_window_get_effective_parent(win);
-#else
-            gdk_window_get_position(win, &px, &py);
-            x += px;
-            y += py;
-            win = gdk_window_get_parent(win);
-#endif
         }
         if (win == NULL)
             /* this should never happen */
@@ -439,14 +429,9 @@ static gboolean on_launchbar_drag_source(GtkWidget *widget, GdkEvent *event,
             if (G_UNLIKELY(drag_src_target_list == NULL))
                 drag_src_target_list = gtk_target_list_new(dnd_targets,
                                                            G_N_ELEMENTS(dnd_targets));
-#if GTK_CHECK_VERSION(3, 10, 0)
             gtk_drag_begin_with_coordinates(widget, drag_src_target_list,
                                             GDK_ACTION_MOVE, 1, event,
                                             event->motion.x, event->motion.y);
-#else
-            gtk_drag_begin(widget, drag_src_target_list, GDK_ACTION_MOVE,
-                           1, event);
-#endif
             return TRUE;
         }
         break;
@@ -466,21 +451,7 @@ static void on_launchbar_drag_begin(GtkWidget *widget, GdkDragContext *context,
         FmIcon *icon = launch_button_get_icon(btn);
 
         if (icon)
-#if GTK_CHECK_VERSION(3, 2, 0)
             gtk_drag_set_icon_gicon(context, fm_icon_get_gicon(icon), 0, 0);
-#else
-        {
-            gint w;
-            GdkPixbuf *pix;
-            gtk_icon_size_lookup(GTK_ICON_SIZE_DND, &w, NULL);
-            pix = fm_pixbuf_from_icon(icon, w);
-            if (pix)
-            {
-                gtk_drag_set_icon_pixbuf(context, pix, 0, 0);
-                g_object_unref(pix);
-            }
-        }
-#endif
     }
 }
 

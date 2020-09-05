@@ -404,32 +404,15 @@ static gint configureEvent(GtkWidget *widget, GdkEventConfigure *event,
 }
 
 
-#if GTK_CHECK_VERSION(3, 0, 0)
 static gint draw(GtkWidget *widget, cairo_t *cr, lx_battery *lx_b) {
-#else
-static gint exposeEvent(GtkWidget *widget, GdkEventExpose *event, lx_battery *lx_b) {
-#endif
 
     ENTER;
 
-#if GTK_CHECK_VERSION(3, 0, 0)
     cairo_set_source_rgb(cr, 0, 0, 0); // FIXME: set black color from the style
-#else
-    cairo_t *cr = gdk_cairo_create(gtk_widget_get_window(widget));
-    GtkStyle *style = gtk_widget_get_style(lx_b->drawingArea);
-
-    gdk_cairo_region(cr, event->region);
-    cairo_clip(cr);
-
-    gdk_cairo_set_source_color(cr, &style->black);
-#endif
     cairo_set_source_surface(cr, lx_b->pixmap, 0, 0);
     cairo_paint(cr);
 
     check_cairo_status(cr);
-#if !GTK_CHECK_VERSION(3, 0, 0)
-    cairo_destroy(cr);
-#endif
 
     RET(FALSE);
 }
@@ -533,13 +516,8 @@ static GtkWidget * constructor(LXPanel *panel, config_setting_t *settings)
 
     g_signal_connect (G_OBJECT (lx_b->drawingArea),"configure-event",
           G_CALLBACK (configureEvent), (gpointer) lx_b);
-#if GTK_CHECK_VERSION(3, 0, 0)
     g_signal_connect (G_OBJECT (lx_b->drawingArea), "draw",
           G_CALLBACK(draw), (gpointer) lx_b);
-#else
-    g_signal_connect (G_OBJECT (lx_b->drawingArea), "expose-event",
-          G_CALLBACK (exposeEvent), (gpointer) lx_b);
-#endif
 
     /* Apply more default options */
     if (! lx_b->alarmCommand)

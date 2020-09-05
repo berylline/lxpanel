@@ -44,9 +44,7 @@
 #include "dbg.h"
 #include "gtk-compat.h"
 
-#if GTK_CHECK_VERSION(3, 0, 0)
 #include <gtk/gtkx.h>
-#endif
 
 static void plugin_class_unref(PluginClass * pc);
 
@@ -197,11 +195,7 @@ void plugin_widget_set_background(GtkWidget * w, LXPanel * panel)
             if (gtk_widget_get_realized(w))
             {
                 GdkWindow *window = gtk_widget_get_window(w);
-#if GTK_CHECK_VERSION(3, 0, 0)
                 gdk_window_set_background_pattern(window, NULL);
-#else
-                gdk_window_set_back_pixmap(window, NULL, TRUE);
-#endif
                 if ((p->background) || (p->transparent))
                     /* Reset background for the child, using background of panel */
                     gdk_window_invalidate_rect(window, NULL, TRUE);
@@ -296,11 +290,7 @@ void lxpanel_plugin_popup_set_position_helper(LXPanel * p, GtkWidget * near, Gtk
         /* panel as a GtkWindow always has a screen */
         screen = gtk_widget_get_screen(GTK_WIDGET(p));
     monitor = gdk_screen_get_monitor_at_point(screen, x, y);
-#if GTK_CHECK_VERSION(3, 4, 0)
     gdk_screen_get_monitor_workarea(screen, monitor, &allocation);
-#else
-    gdk_screen_get_monitor_geometry(screen, monitor, &allocation);
-#endif
     x = CLAMP(x, allocation.x, allocation.x + allocation.width - popup_req.width);
     y = CLAMP(y, allocation.y, allocation.y + allocation.height - popup_req.height);
 
@@ -376,11 +366,7 @@ void lxpanel_plugin_show_config_dialog(GtkWidget* plugin)
         _panel_show_config_dialog(panel, plugin, dlg);
 }
 
-#if GLIB_CHECK_VERSION(2, 32, 0)
 static GRecMutex _mutex;
-#else
-static GStaticRecMutex _mutex = G_STATIC_REC_MUTEX_INIT;
-#endif
 
 #ifndef DISABLE_PLUGINS_LOADING
 FM_MODULE_DEFINE_TYPE(lxpanel_gtk, LXPanelPluginInit, 1)
@@ -436,11 +422,7 @@ gboolean lxpanel_register_plugin_type(const char *name, const LXPanelPluginInit 
     /* validate it */
     if (init->new_instance == NULL || name == NULL || name[0] == '\0')
         return FALSE;
-#if GLIB_CHECK_VERSION(2, 32, 0)
     g_rec_mutex_lock(&_mutex);
-#else
-    g_static_rec_mutex_lock(&_mutex);
-#endif
     /* test if it's registered already */
     data = _find_plugin(name);
     if (data == NULL)
@@ -449,11 +431,7 @@ gboolean lxpanel_register_plugin_type(const char *name, const LXPanelPluginInit 
             init->init();
         g_hash_table_insert(_all_types, g_strdup(name), (gpointer)init);
     }
-#if GLIB_CHECK_VERSION(2, 32, 0)
     g_rec_mutex_unlock(&_mutex);
-#else
-    g_static_rec_mutex_unlock(&_mutex);
-#endif
     return (data == NULL);
 }
 

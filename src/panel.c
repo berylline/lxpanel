@@ -163,21 +163,13 @@ static void panel_stop_gui(LXPanel *self)
     }
 }
 
-#if GTK_CHECK_VERSION(3, 0, 0)
 static void lxpanel_destroy(GtkWidget *object)
-#else
-static void lxpanel_destroy(GtkObject *object)
-#endif
 {
     LXPanel *self = LXPANEL(object);
 
     panel_stop_gui(self);
 
-#if GTK_CHECK_VERSION(3, 0, 0)
     GTK_WIDGET_CLASS(lxpanel_parent_class)->destroy(object);
-#else
-    GTK_OBJECT_CLASS(lxpanel_parent_class)->destroy(object);
-#endif
 }
 
 static gboolean idle_update_background(gpointer p)
@@ -241,12 +233,8 @@ static void lxpanel_size_request(GtkWidget *widget, GtkRequisition *req)
     Panel *p = panel->priv;
     GdkRectangle rect;
 
-#if !GTK_CHECK_VERSION(3, 0, 0)
-    GTK_WIDGET_CLASS(lxpanel_parent_class)->size_request(widget, req);
-#else
     GTK_WIDGET_CLASS(lxpanel_parent_class)->get_preferred_width(widget, &req->width, &req->width);
     GTK_WIDGET_CLASS(lxpanel_parent_class)->get_preferred_height(widget, &req->height, &req->height);
-#endif
 
     if (!p->visible)
         /* When the panel is in invisible state, the content box also got hidden, thus always
@@ -263,7 +251,6 @@ static void lxpanel_size_request(GtkWidget *widget, GtkRequisition *req)
     p->ch = rect.height;
 }
 
-#if GTK_CHECK_VERSION(3, 0, 0)
 static void
 lxpanel_get_preferred_width (GtkWidget *widget,
                              gint      *minimal_width,
@@ -293,7 +280,6 @@ lxpanel_get_preferred_height (GtkWidget *widget,
   if (natural_height)
       *natural_height = requisition.height;
 }
-#endif
 
 static void lxpanel_size_allocate(GtkWidget *widget, GtkAllocation *a)
 {
@@ -398,24 +384,13 @@ static gboolean lxpanel_button_press(GtkWidget *widget, GdkEventButton *event)
 static void lxpanel_class_init(PanelToplevelClass *klass)
 {
     GObjectClass *gobject_class = (GObjectClass *)klass;
-#if !GTK_CHECK_VERSION(3, 0, 0)
-    GtkObjectClass *gtk_object_class = (GtkObjectClass *)klass;
-#endif
     GtkWidgetClass *widget_class = (GtkWidgetClass *)klass;
 
     gobject_class->finalize = lxpanel_finalize;
-#if GTK_CHECK_VERSION(3, 0, 0)
     widget_class->destroy = lxpanel_destroy;
-#else
-    gtk_object_class->destroy = lxpanel_destroy;
-#endif
     widget_class->realize = lxpanel_realize;
-#if GTK_CHECK_VERSION(3, 0, 0)
     widget_class->get_preferred_width = lxpanel_get_preferred_width;
     widget_class->get_preferred_height = lxpanel_get_preferred_height;
-#else
-    widget_class->size_request = lxpanel_size_request;
-#endif
     widget_class->size_allocate = lxpanel_size_allocate;
     widget_class->configure_event = lxpanel_configure_event;
     widget_class->style_set = lxpanel_style_set;
@@ -722,11 +697,7 @@ static void paint_root_pixmap(LXPanel *panel, cairo_t *cr)
     GC gc;
     Display *dpy;
     Pixmap *prop;
-#if GTK_CHECK_VERSION(3, 0, 0)
     cairo_surface_t *surface;
-#else
-    GdkPixmap *pixmap;
-#endif
     Pixmap xpixmap;
     Panel *p = panel->priv;
 
@@ -744,41 +715,23 @@ static void paint_root_pixmap(LXPanel *panel, cairo_t *cr)
         XFree(prop);
     }
     gc = XCreateGC(dpy, xroot, mask, &gcv);
-#if GTK_CHECK_VERSION(3, 0, 0)
     xpixmap = XCreatePixmap(dpy, xroot, p->aw, p->ah,
                             DefaultDepth(dpy, DefaultScreen(dpy)));
     surface = cairo_xlib_surface_create(dpy, xpixmap,
                                         DefaultVisual(dpy, DefaultScreen(dpy)),
                                         p->aw, p->ah);
-#else
-    pixmap = gdk_pixmap_new(gtk_widget_get_window(GTK_WIDGET(panel)),
-                            p->aw, p->ah, -1);
-    xpixmap = gdk_x11_drawable_get_xid(pixmap);
-#endif
     XSetTSOrigin(dpy, gc, -p->ax, -p->ay);
     XFillRectangle(dpy, xpixmap, gc, 0, 0, p->aw, p->ah);
     XFreeGC(dpy, gc);
-#if GTK_CHECK_VERSION(3, 0, 0)
     cairo_set_source_surface(cr, surface, 0, 0);
-#else
-    gdk_cairo_set_source_pixmap(cr, pixmap, 0, 0);
-#endif
     cairo_paint(cr);
-#if GTK_CHECK_VERSION(3, 0, 0)
     cairo_surface_destroy(surface);
     XFreePixmap(dpy, xpixmap);
-#else
-    g_object_unref(pixmap);
-#endif
 }
 
 static void _panel_determine_background_pixmap(LXPanel * panel)
 {
-#if GTK_CHECK_VERSION(3, 0, 0)
     cairo_pattern_t *pattern;
-#else
-    GdkPixmap * pixmap = NULL;
-#endif
     GtkWidget * widget = GTK_WIDGET(panel);
     GdkWindow * window = gtk_widget_get_window(widget);
     Panel * p = panel->priv;
@@ -833,19 +786,9 @@ static void _panel_determine_background_pixmap(LXPanel * panel)
     if (p->surface != NULL)
     {
         gtk_widget_set_app_paintable(widget, TRUE);
-#if GTK_CHECK_VERSION(3, 0, 0)
         pattern = cairo_pattern_create_for_surface(p->surface);
         gdk_window_set_background_pattern(window, pattern);
         cairo_pattern_destroy(pattern);
-#else
-        pixmap = gdk_pixmap_new(window, p->aw, p->ah, -1);
-        cr = gdk_cairo_create(pixmap);
-        cairo_set_source_surface(cr, p->surface, 0, 0);
-        cairo_paint(cr);
-        cairo_destroy(cr);
-        gdk_window_set_back_pixmap(window, pixmap, FALSE);
-        g_object_unref(pixmap);
-#endif
     }
     else
     {
@@ -861,11 +804,7 @@ void panel_determine_background_pixmap(Panel * panel, GtkWidget * widget, GdkWin
         /* Backward compatibility:
            reset background for the child, using background of panel */
         gtk_widget_set_app_paintable(widget, (panel->background || panel->transparent));
-#if GTK_CHECK_VERSION(3, 0, 0)
         gdk_window_set_background_pattern(window, NULL);
-#else
-        gdk_window_set_back_pixmap(window, NULL, TRUE);
-#endif
     }
     else
         _panel_determine_background_pixmap(panel->topgwin);
@@ -892,9 +831,6 @@ static void _panel_update_background(LXPanel * p, gboolean enforce)
 
     /* Redraw the top level widget. */
     _panel_determine_background_pixmap(p);
-#if !GTK_CHECK_VERSION(3, 0, 0)
-    gdk_window_clear(gtk_widget_get_window(w));
-#endif
     gtk_widget_queue_draw(w);
 
     /* Loop over all plugins redrawing each plugin. */

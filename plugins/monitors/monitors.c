@@ -152,11 +152,7 @@ static void     mem_tooltip_update (Monitor *m);
 
 
 static gboolean configure_event(GtkWidget*, GdkEventConfigure*, gpointer);
-#if !GTK_CHECK_VERSION(3, 0, 0)
-static gboolean expose_event(GtkWidget *, GdkEventExpose *, Monitor *);
-#else
 static gboolean draw(GtkWidget *, cairo_t *, Monitor *);
-#endif
 static void redraw_pixmap (Monitor *m);
 
 /* Monitors functions */
@@ -182,13 +178,8 @@ monitor_init(MonitorsPlugin *mp, Monitor *m, gchar *color)
     /* Signals */
     g_signal_connect(G_OBJECT(m->da), "configure-event",
         G_CALLBACK(configure_event), (gpointer) m);
-#if !GTK_CHECK_VERSION(3, 0, 0)
-    g_signal_connect (G_OBJECT(m->da), "expose-event",
-        G_CALLBACK(expose_event), (gpointer) m);
-#else
     g_signal_connect (G_OBJECT(m->da), "draw",
         G_CALLBACK(draw), (gpointer) m);
-#endif
 
     return m;
 }
@@ -486,33 +477,17 @@ configure_event(GtkWidget* widget, GdkEventConfigure* dummy, gpointer data)
     return TRUE;
 }
 
-#if !GTK_CHECK_VERSION(3, 0, 0)
-static gboolean
-expose_event(GtkWidget * widget, GdkEventExpose * event, Monitor *m)
-#else
 static gboolean
 draw(GtkWidget * widget, cairo_t * cr, Monitor *m)
-#endif
 {
     /* Draw the requested part of the pixmap onto the drawing area.
      * Translate it in both x and y by the border size. */
     if (m->pixmap != NULL)
     {
-#if !GTK_CHECK_VERSION(3, 0, 0)
-        cairo_t *cr = gdk_cairo_create(gtk_widget_get_window(widget));
-        GtkStyle *style = gtk_widget_get_style(m->da);
-        gdk_cairo_region(cr, event->region);
-        cairo_clip(cr);
-        gdk_cairo_set_source_color(cr, &style->black);
-#else
         cairo_set_source_rgb(cr, 0, 0, 0); // FIXME: set the color from style
-#endif
         cairo_set_source_surface(cr, m->pixmap, BORDER_SIZE, BORDER_SIZE);
         cairo_paint(cr);
         check_cairo_status(cr);
-#if !GTK_CHECK_VERSION(3, 0, 0)
-        cairo_destroy(cr);
-#endif
     }
 
     return FALSE;

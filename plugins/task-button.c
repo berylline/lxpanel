@@ -222,11 +222,7 @@ static TaskDetails *task_details_for_window(TaskButton *button, Window win)
      *
      * Do not change event mask to gtk windows spawned by this gtk client
      * this breaks gtk internals */
-#if GTK_CHECK_VERSION(2, 24, 0)
     if (!gdk_x11_window_lookup_for_display(display, win))
-#else
-    if (!gdk_window_lookup(win))
-#endif
         XSelectInput(GDK_DISPLAY_XDISPLAY(display), win,
                      PropertyChangeMask | StructureNotifyMask);
 
@@ -478,9 +474,7 @@ static GtkWidget *get_task_button_menu(TaskButton *tb, TaskDetails *task)
  * We also switch the active desktop and viewport if needed. */
 static void task_raise_window(TaskButton *tb, TaskDetails *tk, guint32 time)
 {
-#if GTK_CHECK_VERSION(2, 24, 0)
     GdkDisplay *display = gtk_widget_get_display(GTK_WIDGET(tb));
-#endif
     Screen *xscreen = GDK_SCREEN_XSCREEN(gtk_widget_get_screen(GTK_WIDGET(tb)));
     Display *xdisplay = DisplayOfScreen(xscreen);
 
@@ -494,11 +488,7 @@ static void task_raise_window(TaskButton *tb, TaskDetails *tk, guint32 time)
         Xclimsgx(xscreen, tk->win, a_NET_ACTIVE_WINDOW, 2, time, 0, 0, 0);
     else
     {
-#if GTK_CHECK_VERSION(2, 24, 0)
         GdkWindow * gdkwindow = gdk_x11_window_lookup_for_display(display, tk->win);
-#else
-        GdkWindow * gdkwindow = gdk_xid_table_lookup(tk->win);
-#endif
         if (gdkwindow != NULL)
             gdk_window_show(gdkwindow);
         else
@@ -670,57 +660,6 @@ static void map_xwindow_animation(GtkWidget *widget, Window win, GtkAllocation *
 
 /* Get a pixbuf from a pixmap.
  * Originally from libwnck, Copyright (C) 2001 Havoc Pennington. */
-#if !GTK_CHECK_VERSION(3, 0, 0)
-static GdkPixbuf * _wnck_gdk_pixbuf_get_from_pixmap(GdkScreen *screen, Pixmap xpixmap, Window win, int width, int height)
-{
-    /* Get the drawable. */
-#if GTK_CHECK_VERSION(2, 24, 0)
-    GdkDrawable * drawable = gdk_x11_window_lookup_for_display(gdk_display_get_default(), xpixmap);
-#else
-    GdkDrawable * drawable = gdk_xid_table_lookup(xpixmap);
-#endif
-    if (drawable != NULL)
-        g_object_ref(G_OBJECT(drawable));
-    else
-        drawable = gdk_pixmap_foreign_new(xpixmap);
-
-    GdkColormap * colormap = NULL;
-    GdkPixbuf * retval = NULL;
-    if (drawable != NULL)
-    {
-        /* Get the colormap.
-         * If the drawable has no colormap, use no colormap or the system colormap as recommended in the documentation of gdk_drawable_get_colormap. */
-        colormap = gdk_drawable_get_colormap(drawable);
-        gint depth = gdk_drawable_get_depth(drawable);
-        if (colormap != NULL)
-            g_object_ref(G_OBJECT(colormap));
-        else if (depth == 1)
-            colormap = NULL;
-        else
-        {
-            colormap = gdk_screen_get_system_colormap(screen);
-            g_object_ref(G_OBJECT(colormap));
-        }
-
-        /* Be sure we aren't going to fail due to visual mismatch. */
-        if ((colormap != NULL) && (gdk_visual_get_depth(gdk_colormap_get_visual(colormap)) != depth))
-        {
-            g_object_unref(G_OBJECT(colormap));
-            colormap = NULL;
-        }
-
-        /* Do the major work. */
-        retval = gdk_pixbuf_get_from_drawable(NULL, drawable, colormap, 0, 0, 0, 0, width, height);
-    }
-
-    /* Clean up and return. */
-    if (colormap != NULL)
-        g_object_unref(G_OBJECT(colormap));
-    if (drawable != NULL)
-        g_object_unref(G_OBJECT(drawable));
-    return retval;
-}
-#else
 static GdkPixbuf * _wnck_gdk_pixbuf_get_from_pixmap(GdkScreen *screen, Pixmap xpixmap, Window win, int width, int height)
 {
   cairo_surface_t *surface;
@@ -762,7 +701,6 @@ TRAP_POP:
 
   return pixbuf;
 }
-#endif
 
 /* Apply a mask to a pixbuf.
  * Originally from libwnck, Copyright (C) 2001 Havoc Pennington. */
@@ -1459,9 +1397,7 @@ static void task_button_init(TaskButton *self)
     gtk_widget_set_can_focus(GTK_WIDGET(self), FALSE);
     gtk_widget_set_can_default(GTK_WIDGET(self), FALSE);
     gtk_widget_set_state(GTK_WIDGET(self), GTK_STATE_NORMAL);
-#if GTK_CHECK_VERSION(3, 0, 0)
     gtk_widget_add_events(GTK_WIDGET(self), GDK_SCROLL_MASK);
-#endif
 }
 
 

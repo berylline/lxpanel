@@ -71,7 +71,6 @@
 
 #include "plugin.h"
 #include "misc.h"
-#include "gtk-compat.h"
 
 #define ICONS_VOLUME_HIGH   "volume-high"
 #define ICONS_VOLUME_MEDIUM "volume-medium"

@@ -27,7 +27,6 @@
 #include <glib/gi18n.h>
 
 #include "plugin.h"
-#include "gtk-compat.h"
 
 #include <keybinder.h>
 

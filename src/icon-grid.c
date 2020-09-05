@@ -25,7 +25,6 @@
 
 #include "icon-grid.h"
 #include "panel.h" /* for panel_get_height() */
-#include "gtk-compat.h"
 
 /* Properties */
 enum {

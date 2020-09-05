@@ -51,7 +51,6 @@
 #include "plugin.h"
 #include "misc.h"
 #include "icon.xpm"
-#include "gtk-compat.h"
 
 #define ALL_WORKSPACES       -1
 

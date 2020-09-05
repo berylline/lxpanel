@@ -83,7 +83,6 @@
 #ifndef DISABLE_MENU
 # include "menu-policy.h"
 #endif
-#include "gtk-compat.h"
 
 #define PANEL_ICON_SIZE 24 /* see the private.h */
 

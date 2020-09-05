@@ -43,7 +43,6 @@
 #endif
 #include <libfm/fm-gtk.h>
 
-#include "gtk-compat.h"
 
 static GtkWidget* win = NULL; /* the run dialog */
 #ifndef DISABLE_MENU

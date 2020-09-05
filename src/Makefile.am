@@ -80,7 +80,6 @@ EXTRA_DIST = \
 	ev.h \
 	menu-policy.h \
 	icon-grid-old.h \
-	gtk-compat.h \
 	space.h \
 	private.h
 

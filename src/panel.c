@@ -60,7 +60,6 @@
 
 #include "lxpanelctl.h"
 #include "dbg.h"
-#include "gtk-compat.h"
 
 gchar *cprofile = "default";
 

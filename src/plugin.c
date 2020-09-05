@@ -42,7 +42,6 @@
 
 //#define DEBUG
 #include "dbg.h"
-#include "gtk-compat.h"
 
 #include <gtk/gtkx.h>
 

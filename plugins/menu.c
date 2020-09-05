@@ -53,7 +53,6 @@
 #include "menu-policy.h"
 
 #include "dbg.h"
-#include "gtk-compat.h"
 
 /* support for libmenu-cache 0.4.x */
 #ifndef MENU_CACHE_CHECK_VERSION

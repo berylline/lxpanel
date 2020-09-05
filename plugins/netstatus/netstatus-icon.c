@@ -31,7 +31,6 @@
 #include "netstatus-enums.h"
 #include "netstatus-fallback-pixbuf.h"
 
-#include "gtk-compat.h"
 
 typedef enum
 {

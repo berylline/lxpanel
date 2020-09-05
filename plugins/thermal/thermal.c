@@ -47,9 +47,6 @@
 #define MAX_NUM_SENSORS 10
 #define MAX_AUTOMATIC_CRITICAL_TEMP 150 /* in degrees Celsius */
 
-#if !GLIB_CHECK_VERSION(2, 40, 0)
-# define g_info(...) g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
-#endif
 
 typedef gint (*GetTempFunc)(char const *);
 
